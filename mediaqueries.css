@@ -1,0 +1,23 @@
+@media screen and (max-width:460px) {
+    nav  {
+        width: 100%;
+        }
+    .form-container {
+        display: none;
+    }
+    .cart-container {
+        gap: 10px;
+        width: 20%;
+    }
+}
+
+ @media screen and(max-width:768px) {
+    nav {
+        width: 100%;
+    }
+
+    .form-container {
+       display: flex;
+       justify-content: center;
+    }
+} 
