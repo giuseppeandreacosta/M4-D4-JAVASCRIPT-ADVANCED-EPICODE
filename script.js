@@ -1,128 +1,101 @@
 const apiUrl = "https://striveschool-api.herokuapp.com/books";
 const cardsContainer = document.querySelector(".cards-container");
-const cartsContainer = document.querySelector(".cart-items")
-const searchForm = document.querySelector('form[action="search"]');
+const cartsContainer = document.querySelector(".cart-items");
+const searchForm = document.querySelector('.form-container');
 const searchInput = searchForm.querySelector('input[type="text"]');
 
+let cart = [];
+let books = {};
 
+// Funzione che prende dati dall'API 
 function getDatas(apiUrl) {
-    fetch(apiUrl,{
-        method : 'GET',
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        generateHTML(data);// Chiamata alla funzione generateHTML con i dati recuperati
-       
+  fetch(apiUrl, {
+    method: "GET",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      generateHTML(data); // Chiamata alla funzione generateHTML con i dati recuperati
     })
     .catch((error) => {
-        console.error('Errore: ' , error)
-    })
-}   console.log(getDatas(apiUrl))
+      console.error("Errore: ", error);
+    });
+}
+
 getDatas(apiUrl);
 
-// Funzione che prende dati dall'API e li mette nel DOM.
-
-const generateHTML = (books) => {
-    cardsContainer.innerHTML += books.map(book =>
-        `<li class="card">
-        <img src="${book.img}" alt="book image">
+const generateHTML = (booksData) => {
+  cardsContainer.innerHTML += booksData
+    .map((book) => {
+                                        //genero tramite JavaScript HTML ,
+      books[book] = book;               //in questo caso ho iniettato nel DOM delle cards con immagine,titolo e prezzo.
+      return `<li class="card">
+            <img src="${book.img}" alt="book image">
             <div class="details">
                 <span>Title: ${book.title}</span>
-                <span>Price: ${book.price}</span>
-                <button> Add to cart </button>
+                <span>Price: € ${book.price}</span>
+                <button onclick="addToCart('${book}')"> Add to cart </button>
             </div>
-        </li>`
-    ).join("");
+        </li>`;
+    })
+    .join("");
+};
+
+function addToCart(bookId) {
+  const book = books[bookId]; //Questa riga seleziona un libro dall’array books utilizzando bookId come indice. Il libro selezionato viene quindi salvato nella variabile book.
+  cart.push(book); // Aggiunge il libro selezionato nell'array Cart.
+  updateCartIcon(); // richiama la funzione per aggiornare il contatore del carrello
+  updateCartTotal(); // richiama la funzione che calcola la somma dei libri nel carrello
+  showCart(); // richiama la funzione che mostra il carrello.
 }
 
-
-
-
-searchForm.addEventListener('input', function(event) {
-    event.preventDefault(); // Previene il comportamento di default del form
-    const searchTerm = searchInput.value.toLowerCase(); // Prende il valore dell'input e lo rende minuscolo
-
-    const books = document.querySelectorAll('.card'); // Seleziona tutti i libri
-    books.forEach(book => {
-        const title = book.querySelector('.details span').textContent.toLowerCase(); // Prende il titolo del libro e lo rende minuscolo
-        if (title.includes(searchTerm)) { // Controlla se il titolo del libro include il termine di ricerca
-            book.style.display = 'block'; // Se il termine di ricerca è nel titolo, mostra il libro
-        } else {
-            book.style.display = 'none'; // Se il termine di ricerca non è nel titolo, nasconde il libro
-        }
-    });
+searchInput.addEventListener("input", function (event) {
+//   event.preventDefault(); // Previene il comportamento di default del form
+  const searchTerm = searchInput.value.toLowerCase(); // Prende il valore dell'input e lo rende minuscolo
+  const books = document.querySelectorAll(".card"); // Seleziona tutti i libri
+  books.forEach((book) => {
+    const title = book.querySelector(".details span").textContent.toLowerCase(); // Prende il titolo del libro e lo rende minuscolo
+    if (searchTerm.length < 3 || title.includes(searchTerm)) {
+      // Controlla se il titolo del libro è nella ricerca
+      book.style.display = "block"; // Se c'è il libro mette display block
+    } else {
+      book.style.display = "none"; // Se non trova il libro mette display none
+    }
+  });
 });
-
-
-
-let cart = [];
-
-function addToCart(book) {
-    cart.push(book);
-    updateCartIcon();
-    updateCartTotal();
-    showCart();
-}
 
 function updateCartIcon() {
-    const cartIcon = document.querySelector('.bi-cart');
-    cartIcon.textContent = cart.length;
-    
+  const cartIcon = document.querySelector(".bi-cart"); // seleziono l'icona del carrello
+  cartIcon.textContent = cart.length; //aggiorna il numero corrente dell'icona carrello
 }
-
-
 
 function updateCartTotal() {
-    const cartTotal = document.querySelector('.cart-total span:nth-child(2)');
-    let total = 0;
-    for (let book of cart) {
-        total += book.price;
-    }
-    cartTotal.textContent = '€' + total.toFixed(2);
+  const cartTotal = document.querySelector(".cart-total span:nth-child(2)"); // selezione il secondo span
+  let total = 0;
+  for (let i = 0; i < cart.length; i++) {
+    //itera tutto l'array cart
+    total += cart[i].price;
+  }
+  cartTotal.textContent = "€" + total.toFixed(2); //mostra il prezzo sommato // toFixed formatta un numero in modo tale da visualizzarlo in maniera decimale
 }
-
-cardsContainer.addEventListener('click', function(event) {
-    if (event.target.tagName === 'BUTTON') {
-        const card = event.target.closest('.card');
-        const book = {
-            img: card.querySelector('img').src,
-            title: card.querySelector('.details span:nth-child(1)').textContent,
-            price: parseFloat(card.querySelector('.details span:nth-child(2)').textContent.replace('Price: ', ''))
-        };
-        addToCart(book);
-    }
-});
 
 function showCart() {
-    const cart = document.querySelector('.cart');
-    cart.style.display = 'block';
+  const cartElement = document.querySelector(".cart"); //seleziono il carrello
+  cartElement.style.display = "block"; // il carrello di default è display none , quando aggiungo "libri", il carrello si mostra
 }
-
-
 
 function removeFromCart(bookTitle) {
-    const index = cart.findIndex(book => book.title === bookTitle);
-    if (index !== -1) {
-        cart.splice(index, 1);
-        updateCartIcon();
-        updateCartTotal();
-    }
-}
-
-cardsContainer.addEventListener('click', function(event) {
-    if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Remove from cart') {
-        const card = event.target.closest('.card');
-        const bookTitle = card.querySelector('.details span:nth-child(1)').textContent;
-        removeFromCart(bookTitle);
-    }
-});
-
-document.querySelector('.delete-cart').addEventListener('click', function() {
-    cart = []; // Svuota l'array del carrello
+  const index = cart.findIndex((book) => book.title === bookTitle); // funzione per rimuovere dal carrello il totale.
+  if (index !== -1) {
+    cart.splice(index, 1); // il metodo splice modifica l'array originale e restituisce un nuovo array contenente gli elementi rimossi.
     updateCartIcon();
     updateCartTotal();
+  }
+}
+
+document.querySelector(".delete-cart").addEventListener("click", function () {
+  // prendo l'icona per rimuovere contenuti dal carrello
+  cart = []; // Svuota l'array del carrello
+  updateCartIcon(); // richiama la funzione per aggiornare il contatore del carrello
+  updateCartTotal(); // richiama la funzione che calcola la somma dei libri nel carrello
 });
-
-
-
