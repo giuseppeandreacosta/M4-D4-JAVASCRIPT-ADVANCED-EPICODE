@@ -1,5 +1,6 @@
 const apiUrl = "https://striveschool-api.herokuapp.com/books";
 const cardsContainer = document.querySelector(".cards-container");
+const cartsContainer = document.querySelector(".cart-items")
 const searchForm = document.querySelector('form[action="search"]');
 const searchInput = searchForm.querySelector('input[type="text"]');
 
@@ -11,7 +12,8 @@ function getDatas(apiUrl) {
     .then(response => response.json())
     .then(data => {
         console.log(data);
-        generateHTML(data); // Chiamata alla funzione generateHTML con i dati recuperati
+        generateHTML(data);// Chiamata alla funzione generateHTML con i dati recuperati
+       
     })
     .catch((error) => {
         console.error('Errore: ' , error)
@@ -24,7 +26,7 @@ getDatas(apiUrl);
 const generateHTML = (books) => {
     cardsContainer.innerHTML += books.map(book =>
         `<li class="card">
-            <img src="${book.img}" alt="book image">
+        <img src="${book.img}" alt="book image">
             <div class="details">
                 <span>Title: ${book.title}</span>
                 <span>Price: ${book.price}</span>
@@ -33,6 +35,9 @@ const generateHTML = (books) => {
         </li>`
     ).join("");
 }
+
+
+
 
 searchForm.addEventListener('input', function(event) {
     event.preventDefault(); // Previene il comportamento di default del form
@@ -63,7 +68,10 @@ function addToCart(book) {
 function updateCartIcon() {
     const cartIcon = document.querySelector('.bi-cart');
     cartIcon.textContent = cart.length;
+    
 }
+
+
 
 function updateCartTotal() {
     const cartTotal = document.querySelector('.cart-total span:nth-child(2)');
@@ -90,6 +98,7 @@ function showCart() {
     const cart = document.querySelector('.cart');
     cart.style.display = 'block';
 }
+
 
 
 function removeFromCart(bookTitle) {
