@@ -6,7 +6,7 @@
     list-style: none;
     text-overflow: ellipsis;
     overflow-x: hidden;
-    
+    text-decoration: none;
     white-space: nowrap;
 
 }
@@ -175,7 +175,7 @@ nav .nav-bar .form-container input {
     flex-direction: column;
     display: flex;
     width: 100%;
-    max-height: 100px;
+   
     justify-content: space-between;
 }
 
@@ -185,10 +185,14 @@ nav .nav-bar .form-container input {
 }
 
 .details button {
-    margin: 8px 55px;
+    margin: 8px 15px;
     cursor: pointer;
+    text-decoration: none;
 }
 
+.details button > a {
+    color: dark;
+}
 
 
 

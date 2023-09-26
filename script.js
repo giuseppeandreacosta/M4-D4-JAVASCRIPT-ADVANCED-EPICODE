@@ -29,17 +29,45 @@ const generateHTML = (booksData) => {
     .map((book) => {
                                         //genero tramite JavaScript HTML ,
       books[book] = book;               //in questo caso ho iniettato nel DOM delle cards con immagine,titolo e prezzo.
-      return `<li class="card">
+      return `<li class="card" id="${book.asin}">
             <img src="${book.img}" alt="book image">
             <div class="details">
                 <span>Title: ${book.title}</span>
                 <span>Price: € ${book.price}</span>
+                <div class="buttons">
                 <button onclick="addToCart('${book}')"> Add to cart </button>
+                <button class="skipCards"> Skip </button>
+                <button onclick="window.location.href='details.html?asin=${book.asin}'">Details</button>
+                </div>
             </div>
         </li>`;
     })
     .join("");
+    
+    // Aggiungi un event listener a ciascun pulsante "Skip"
+document.querySelectorAll('.skipCards').forEach((button, index) => {
+  button.addEventListener('click', () => {
+      const card = document.querySelectorAll('.card')[index];
+      card.style.display = 'none';
+  });
+});
+booksData.forEach((book) => {
+  document.getElementById(book.asin).addEventListener('click', () => {
+      console.log(books[book.asin]);
+  });
+});
 };
+
+const fetchBookDetails = (asin) => {
+  let apiUrl = `https://striveschool-api.herokuapp.com/books/?id=${asin}`;
+  fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+          // Qui puoi fare qualcosa con i dati del libro, come visualizzarli in un modal
+      })
+      .catch(error => console.error('Errore:', error));
+}
 
 function addToCart(bookId) {
   const book = books[bookId]; //Questa riga seleziona un libro dall’array books utilizzando bookId come indice. Il libro selezionato viene quindi salvato nella variabile book.
@@ -63,6 +91,9 @@ searchInput.addEventListener("input", function (event) {
     }
   });
 });
+
+
+
 
 function updateCartIcon() {
   const cartIcon = document.querySelector(".bi-cart"); // seleziono l'icona del carrello
